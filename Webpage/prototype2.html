@@ -78,15 +78,10 @@
             display: inline-block;
         }
 
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
+        .switch input { opacity: 0; }
 
         .slider {
             position: absolute;
-            cursor: pointer;
             inset: 0;
             background-color: #ccc;
             border-radius: 26px;
@@ -100,7 +95,7 @@
             width: 20px;
             left: 3px;
             bottom: 3px;
-            background-color: white;
+            background: white;
             border-radius: 50%;
             transition: 0.3s;
         }
@@ -119,7 +114,6 @@
             width: 100%;
             background: #fffaf5;
             border-radius: 12px;
-            overflow: hidden;
         }
 
         .toggle-table th {
@@ -144,30 +138,11 @@
 
 <h2>HSA Horizon</h2>
 
+<!-- SURVEY -->
 <h3>Recommendation Survey</h3>
 
 <div class="input-group">
-    <label>Education Level:</label>
-    <select id="A5_2015">
-        <option>Bachelor's degree</option>
-        <option>High school</option>
-        <option>Some college</option>
-        <option>Graduate degree</option>
-    </select>
-</div>
-
-<div class="input-group">
-    <label>Employment Status:</label>
-    <select id="A9">
-        <option>Student</option>
-        <option>Employed</option>
-        <option>Unemployed</option>
-        <option>Retired</option>
-    </select>
-</div>
-
-<div class="input-group">
-    <label>Financial Satisfaction:</label>
+    <label>Financial Satisfaction (1-5)</label>
     <select id="J1">
         <option>1</option><option>2</option>
         <option>3</option><option>4</option>
@@ -176,7 +151,7 @@
 </div>
 
 <div class="input-group">
-    <label>Risk Tolerance:</label>
+    <label>Risk Tolerance (1-5)</label>
     <select id="J2">
         <option>1</option><option>2</option>
         <option>3</option><option>4</option>
@@ -185,32 +160,7 @@
 </div>
 
 <div class="input-group">
-    <label>Difficulty Paying Bills:</label>
-    <select id="J4">
-        <option>Rarely</option>
-        <option>Sometimes</option>
-        <option>Often</option>
-    </select>
-</div>
-
-<div class="input-group">
-    <label>Emergency Savings:</label>
-    <select id="J5">
-        <option>Yes</option>
-        <option>No</option>
-    </select>
-</div>
-
-<div class="input-group">
-    <label>Health Insurance:</label>
-    <select id="H1">
-        <option>Yes</option>
-        <option>No</option>
-    </select>
-</div>
-
-<div class="input-group">
-    <label>Credit Cards (1-5):</label>
+    <label>Credit Cards (1-5)</label>
     <select id="F1">
         <option>1</option><option>2</option>
         <option>3</option><option>4</option>
@@ -219,7 +169,7 @@
 </div>
 
 <div class="input-group">
-    <label>Debt Perception (1-5):</label>
+    <label>Debt Perception (1-5)</label>
     <select id="G23">
         <option>1</option><option>2</option>
         <option>3</option><option>4</option>
@@ -231,7 +181,8 @@
 
 <div class="info-box" id="predictionBox"></div>
 
-<h3>Simulation Inputs (Auto-Updated)</h3>
+<!-- SIMULATION -->
+<h3>Simulation Inputs</h3>
 
 <div class="input-group">
     <label>Initial Savings ($):</label>
@@ -298,34 +249,31 @@
 <canvas id="barChart"></canvas>
 
 <script>
+let predictionTable = {};
 const paychecksPerYear = 26;
 const projectionYears = [1, 5, 10, 15, 20];
 
-let predictionTable = {};
-
+// Load reduced prediction table
 async function loadTable() {
     try {
-        const res = await fetch("prediction_table_full.json");
+        const res = await fetch("prediction_table_full_reduced.json");
         predictionTable = await res.json();
     } catch (e) {
         console.error("Prediction table not found.");
     }
 }
 
+// Build lookup key (reduced features)
 function buildKey() {
     return [
-        document.getElementById("A5_2015").value,
-        document.getElementById("A9").value,
         document.getElementById("J1").value,
         document.getElementById("J2").value,
-        document.getElementById("J4").value,
-        document.getElementById("J5").value,
-        document.getElementById("H1").value,
         document.getElementById("F1").value,
         document.getElementById("G23").value
     ].join("|");
 }
 
+// Survey submission (table lookup)
 function submitSurvey() {
     const key = buildKey();
     const predicted = predictionTable[key];
@@ -337,12 +285,13 @@ function submitSurvey() {
     }
 
     document.getElementById("predictionBox").innerHTML =
-        `<strong>Recommended HSA Contribution:</strong> $${predicted} per paycheck`;
+        `<strong>Recommended HSA Contribution (Insured Scenario):</strong> $${predicted} per paycheck`;
 
     document.getElementById("hsaContribution").value = predicted;
     updateChart();
 }
 
+// Info box
 function updateInfoBox() {
     const hsa = parseFloat(document.getElementById("hsaContribution").value) || 0;
     const pay = parseFloat(document.getElementById("paycheckAmount").value) || 1;
@@ -352,27 +301,22 @@ function updateInfoBox() {
 
     document.getElementById("hsaInfo").innerHTML = `
         <strong>HSA Contribution Breakdown:</strong><br>
-        Percent of paycheck: ${percent.toFixed(2)}%<br>
+        Percent: ${percent.toFixed(2)}%<br>
         Monthly: $${monthly.toFixed(2)}<br>
         Annual: $${yearly.toFixed(2)}
     `;
 }
 
+// Medical costs
 function getMedicalAnnualCost() {
     let total = 0;
     const ranges = {
-        dentalWith: [240, 600],
-        dentalWithout: [200, 600],
-        visionWith: [25, 25],
-        visionWithout: [75, 250],
-        rxWith: [10, 50],
-        rxWithout: [30, 200],
-        mhWith: [0, 50],
-        mhWithout: [100, 200],
-        ptWith: [10, 50],
-        ptWithout: [75, 350],
-        ccWith: [3000, 6000],
-        ccWithout: [3000, 10000]
+        dentalWith:[240,600], dentalWithout:[200,600],
+        visionWith:[25,25], visionWithout:[75,250],
+        rxWith:[10,50], rxWithout:[30,200],
+        mhWith:[0,50], mhWithout:[100,200],
+        ptWith:[10,50], ptWithout:[75,350],
+        ccWith:[3000,6000], ccWithout:[3000,10000]
     };
 
     Object.keys(ranges).forEach(id => {
@@ -382,10 +326,10 @@ function getMedicalAnnualCost() {
             total += Math.random() * (high - low) + low;
         }
     });
-
     return total;
 }
 
+// Projection
 function projectBalances(years, initialSavings, paycheckAmount, hsaContribution) {
     let savings = initialSavings;
     let hsa = 0;
@@ -394,15 +338,15 @@ function projectBalances(years, initialSavings, paycheckAmount, hsaContribution)
         let yearlyHSA = hsaContribution * paychecksPerYear;
         let medicalCost = getMedicalAnnualCost();
         let remainingAfterHSA = (paycheckAmount - hsaContribution) * paychecksPerYear;
-        let yearlySavingsFromRule = remainingAfterHSA * 0.10;
+        let yearlySavings = remainingAfterHSA * 0.10;
 
         hsa = (hsa + yearlyHSA - medicalCost);
-        savings = (savings + yearlySavingsFromRule);
+        savings = (savings + yearlySavings);
     }
-
     return { savings, hsa };
 }
 
+// Chart update
 function updateChart() {
     updateInfoBox();
 
@@ -430,6 +374,7 @@ document.querySelectorAll("input, select").forEach(el => {
     el.addEventListener("input", updateChart);
 });
 
+// Chart
 let chart = new Chart(document.getElementById("barChart").getContext("2d"), {
     type: "bar",
     data: {
@@ -439,7 +384,10 @@ let chart = new Chart(document.getElementById("barChart").getContext("2d"), {
             { label: "HSA", data: [], backgroundColor: "#5b8bd0" }
         ]
     },
-    options: { responsive: true, scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } } }
+    options: {
+        responsive: true,
+        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+    }
 });
 
 loadTable().then(updateChart);
