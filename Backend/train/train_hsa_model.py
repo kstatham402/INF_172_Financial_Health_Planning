@@ -1,3 +1,6 @@
+# ======================================
+# IMPORTS
+# ======================================
 import pandas as pd
 import numpy as np
 import joblib
@@ -9,24 +12,20 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.metrics import mean_absolute_error
 
-# ===============================
-# Load Dataset
-# ===============================
+# ======================================
+# LOAD DATA
+# ======================================
+df = pd.read_csv("Backend/data/NFCS_2024_State_Data_250623.csv")
 
-df = pd.read_csv("data/NFCS_2024_State_Data_250623.csv")
-
-# ===============================
-# Target Variable (Recommended Contribution)
-# ===============================
-
+# ======================================
+# TARGET VARIABLE
+# ======================================
 def estimate_contribution(row):
-    # Use survey variables (no leakage)
-    income = row["A8_2021"]          # Household income bracket
-    risk = row["H30_3"]              # Avoided medical care due to cost
-    chronic = row.get("H1", 0)       # Health insurance indicator (proxy)
-    hospitalizations = row.get("H30_3", 0)  # medical risk proxy
+    income = row["A8_2021"]
+    risk = row["H30_3"] if "H30_3" in row else 0
+    chronic = row.get("H1", 0)
+    hospitalizations = row.get("H30_3", 0)
 
-    # synthetic rule (financial + medical exposure)
     base = 20
     base += (income * 5)
     base += (risk * 15)
@@ -35,53 +34,40 @@ def estimate_contribution(row):
 
     return max(base, 10)
 
-
 df["recommended_contribution"] = df.apply(estimate_contribution, axis=1)
 
-print(df[["recommended_contribution"]].describe())
-
-# ===============================
-# Feature Selection (Survey Codes)
-# ===============================
+# ======================================
+# FEATURE SELECTION (REDUCED)
+# ======================================
 feature_cols = [
-    "A5_2015",      # education level
-    "A9",           # employment status
-    "J1",           # financial satisfaction
-    "J2",           # risk tolerance
-    "J4",           # difficulty paying bills
-    "J5",           # emergency savings
-    "H1",           # health insurance
-    "F1",           # credit cards
-    "G23",          # debt perception
-    "wgt_n2"        # sample weight
+    "H1",
+    "J1",
+    "J2",
+    "F1",
+    "G23",
+    "wgt_n2"
 ]
 
-# Keep only columns that exist in dataset
 feature_cols = [col for col in feature_cols if col in df.columns]
-
-# df = df.convert_dtypes()
 
 X = df[feature_cols]
 y = df["recommended_contribution"]
 
-# ===============================
-# Preprocessing (Categorical + Numeric)
-# ===============================
+# ======================================
+# PREPROCESSING (MANUAL)
+# ======================================
+
 categorical = [
-    "A5_2015",
-    "A9",
-    "J4",
-    "J5",
-    "H1"]
+    "H1"    # health insurance (one-hot -> H1_98, H1_99)
+]
 
 numeric = [
     "J1",
     "J2",
     "F1",
     "G23",
-    "wgt_n2"]
-# categorical = X.select_dtypes(include=["object"]).columns.tolist()
-# numeric = [col for col in X.columns if col not in categorical]
+    "wgt_n2"
+]
 
 preprocessor = ColumnTransformer(
     transformers=[
@@ -91,10 +77,9 @@ preprocessor = ColumnTransformer(
     remainder="drop"
 )
 
-# ===============================
-# Model Pipeline
-# ===============================
-
+# ======================================
+# MODEL PIPELINE
+# ======================================
 model = Pipeline([
     ("preprocessor", preprocessor),
     ("regressor", RandomForestRegressor(
@@ -103,36 +88,52 @@ model = Pipeline([
     ))
 ])
 
-# ===============================
-# Train/Test Split
-# ===============================
-
+# ======================================
+# TRAIN / VALIDATION SPLIT
+# ======================================
 X_train, X_val, y_train, y_val = train_test_split(
     X, y,
     test_size=0.2,
     random_state=42
 )
 
-# ===============================
-# Train
-# ===============================
-
+# ======================================
+# TRAIN
+# ======================================
 model.fit(X_train, y_train)
 
-# ===============================
-# Validate
-# ===============================
-
+# ======================================
+# VALIDATE
+# ======================================
 val_pred = model.predict(X_val)
 mae = mean_absolute_error(y_val, val_pred)
 
 print(f"Validation MAE: {mae:.2f}")
 
-# ===============================
-# Save Model
-# ===============================
+# ======================================
+# FEATURE IMPORTANCE
+# ======================================
+preprocessor = model.named_steps["preprocessor"]
+rf = model.named_steps["regressor"]
 
-joblib.dump(model, "models/hsa_recommendation_model.pkl")
+ohe = preprocessor.named_transformers_["cat"]
+cat_features = ohe.get_feature_names_out()
+num_features = numeric
 
-print("Model saved as hsa_recommendation_model.pkl")
+feature_names = list(cat_features) + list(num_features)
 
+importances = rf.feature_importances_
+
+fi = pd.DataFrame({
+    "feature": feature_names,
+    "importance": importances
+}).sort_values("importance", ascending=False)
+
+print(fi)
+
+# ======================================
+# SAVE MODEL
+# ======================================
+joblib.dump(model, "Backend/models/hsa_recommendation_model_reduced.pkl")
+
+print("Model saved as models/hsa_recommendation_model_reduced.pkl")
