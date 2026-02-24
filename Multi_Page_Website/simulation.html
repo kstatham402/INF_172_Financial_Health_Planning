@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HSA Horizon - Simulation</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .info-icon {
+        display: inline-block;
+        margin-left: 6px;
+        width: 16px;
+        height: 16px;
+        line-height: 16px;
+        text-align: center;
+        font-size: 12px;
+        font-weight: bold;
+        border-radius: 50%;
+        background: #5b8bd0;
+        color: white;
+        cursor: pointer;
+        position: relative;
+    }
+
+    .tooltip-box {
+        visibility: hidden;
+        width: 260px;
+        background-color: #333;
+        color: #fff;
+        text-align: left;
+        padding: 8px;
+        border-radius: 6px;
+        position: absolute;
+        z-index: 10;
+        bottom: 125%;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 12px;
+        line-height: 1.4;
+        opacity: 0;
+        transition: opacity 0.2s ease-in-out;
+    }
+
+    .info-icon:hover .tooltip-box {
+        visibility: visible;
+        opacity: 1;
+    }
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 30px;
+            max-width: 1050px;
+            margin: auto;
+            background: linear-gradient(180deg, #ffd6b3, #6495ED);
+            color: black;
+        }
+
+        h2, h3 { color: black; }
+
+        input, select {
+            padding: 8px;
+            font-size: 16px;
+            width: 200px;
+            border-radius: 8px;
+            border: 1px solid #d0b8a8;
+            background: #fff;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+            background: #fffaf5;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #f0d8c5;
+        }
+
+        .info-box {
+            background: #f0f7ff;
+            padding: 10px;
+            border-left: 4px solid #5b8bd0;
+            margin-top: 10px;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+
+        .warning-box {
+            background: #ffe3e3;
+            color: #900;
+            padding: 12px;
+            border-left: 5px solid red;
+            margin-top: 15px;
+            font-weight: bold;
+            display: none;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 8px 14px;
+            font-size: 14px;
+            margin-top: 10px;
+            border-radius: 8px;
+            border: none;
+            background: #ff8a5c;
+            color: white;
+            cursor: pointer;
+        }
+
+        canvas {
+            margin-top: 40px;
+            background: white;
+            border-radius: 12px;
+            padding: 10px;
+        }
+
+        /* Lever Switch */
+        .switch {
+            position: relative;
+            width: 50px;
+            height: 26px;
+            display: inline-block;
+        }
+
+        .switch input { opacity: 0; }
+
+        .slider {
+            position: absolute;
+            inset: 0;
+            background-color: #ccc;
+            border-radius: 26px;
+            transition: 0.3s;
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+
+        input:checked + .slider {
+            background-color: #ff8a5c;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .toggle-table {
+            margin-top: 20px;
+            border-collapse: collapse;
+            width: 100%;
+            background: #fffaf5;
+            border-radius: 12px;
+        }
+
+        .toggle-table th {
+            background: #ffb07c;
+            color: white;
+            padding: 10px;
+        }
+
+        .toggle-table td {
+            padding: 10px;
+            border: 1px solid #f0d8c5;
+            text-align: center;
+        }
+
+        .row-label {
+            text-align: left;
+            font-weight: bold;
+        }
+        .nav-button {
+            display: inline-block;
+            padding: 8px 14px;
+            font-size: 14px;
+            border-radius: 8px;
+            background: #ff8a5c;
+            color: white;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            background: #ff7040;
+        }
+    </style>
+</head>
+<body>
+
+<h2>HSA Horizon</h2>
+<nav>
+    <a href="survey.html" class="nav-button">Return to Survey</a>
+</nav>
+
+<h3>Simulation Inputs</h3>
+
+<div class="input-group">
+    <label>Initial Savings ($):</label>
+    <input type="number" id="initialSavings" value="6500" step="0.01">
+</div>
+
+<div class="input-group">
+    <label>Paycheck Amount (Bi-Weekly $):</label>
+    <input type="number" id="paycheckAmount" value="900" step="0.01">
+</div>
+
+<div class="input-group">
+    <label>HSA Contribution (Per Paycheck $):</label>
+    <input type="number" id="hsaContribution" value="150" step="0.01">
+</div>
+
+<div class="info-box" id="hsaInfo"></div>
+<div id="hsaWarning" class="warning-box"></div>
+
+<h3>
+    Medical Expenses
+    <span class="info-icon">i
+        <span class="tooltip-box">
+            Toggle an expense to simulate using your HSA funds for that category.
+            <br><br>
+            When selected, the model deducts a randomly generated cost within the listed insured/uninsured price ranges to reflect different real-world scenarios and insurance coverage levels.
+            <br><br>
+            If your annual HSA contributions are not enough to cover the generated amount, your balance may go negative, illustrating potential out-of-pocket exposure.
+        </span>
+    </span>
+</h3>
+
+<table class="toggle-table">
+    <thead>
+        <tr>
+            <th>Medical Category</th>
+            <th>Insured</th>
+            <th>Uninsured</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td class="row-label">
+                Dental
+                <span class="info-icon">i
+                    <span class="tooltip-box">
+                        <strong>Insured:</strong> $240 - $600<br>
+                        <strong>Uninsured:</strong> $200 - $600
+                    </span>
+                </span>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="dentalWith">
+                    <span class="slider"></span>
+                </label>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="dentalWithout">
+                    <span class="slider"></span>
+                </label>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="row-label">
+                Vision
+                <span class="info-icon">i
+                    <span class="tooltip-box">
+                        <strong>Insured:</strong> $120 - $300<br>
+                        <strong>Uninsured:</strong> $100 - $600
+                    </span>
+                </span>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="visionWith">
+                    <span class="slider"></span>
+                </label>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="visionWithout">
+                    <span class="slider"></span>
+                </label>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="row-label">
+                Prescriptions
+                <span class="info-icon">i
+                    <span class="tooltip-box">
+                        <strong>Insured:</strong> $10 - $50<br>
+                        <strong>Uninsured:</strong> $30 - $200
+                    </span>
+                </span>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="rxWith">
+                    <span class="slider"></span>
+                </label>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="rxWithout">
+                    <span class="slider"></span>
+                </label>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="row-label">
+                Mental Health
+                <span class="info-icon">i
+                    <span class="tooltip-box">
+                        <strong>Insured:</strong> $0 - $50<br>
+                        <strong>Uninsured:</strong> $100 - $200
+                    </span>
+                </span>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="mhWith">
+                    <span class="slider"></span>
+                </label>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="mhWithout">
+                    <span class="slider"></span>
+                </label>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="row-label">
+                Physical Therapy
+                <span class="info-icon">i
+                    <span class="tooltip-box">
+                        <strong>Insured:</strong> $10 - $50<br>
+                        <strong>Uninsured:</strong> $75 - $350
+                    </span>
+                </span>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="ptWith">
+                    <span class="slider"></span>
+                </label>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="ptWithout">
+                    <span class="slider"></span>
+                </label>
+            </td>
+        </tr>
+
+        <tr>
+            <td class="row-label">
+                Chronic Condition
+                <span class="info-icon">i
+                    <span class="tooltip-box">
+                        <strong>Insured:</strong> $3000 - $6000<br>
+                        <strong>Uninsured:</strong> $3000 - $10000
+                    </span>
+                </span>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="ccWith">
+                    <span class="slider"></span>
+                </label>
+            </td>
+            <td>
+                <label class="switch">
+                    <input type="checkbox" id="ccWithout">
+                    <span class="slider"></span>
+                </label>
+            </td>
+        </tr>
+    </tbody>
+</table>
+<canvas id="barChart"></canvas>
+
+<script>
+
+
+const paychecksPerYear = 26;
+const projectionYears = [1,5,10,15,20];
+
+function updateInfoBox() {
+    const hsa = parseFloat(document.getElementById("hsaContribution").value) || 0;
+    const pay = parseFloat(document.getElementById("paycheckAmount").value) || 1;
+    const percent = (hsa / pay) * 100;
+    const monthly = hsa * paychecksPerYear / 12;
+    const yearly = hsa * paychecksPerYear;
+
+    document.getElementById("hsaInfo").innerHTML =
+        `<strong>HSA Contribution Breakdown:</strong><br>
+         Percent: ${percent.toFixed(2)}%<br>
+         Monthly: $${monthly.toFixed(2)}<br>
+         Annual: $${yearly.toFixed(2)}`;
+}
+
+function getMedicalAnnualCost() {
+    let total = 0;
+    const ranges = {
+        dentalWith:[240,600], dentalWithout:[200,600],
+        visionWith:[60,360], visionWithout:[100,600],
+        rxWith:[10,50], rxWithout:[30,200],
+        mhWith:[0,50], mhWithout:[100,200],
+        ptWith:[10,50], ptWithout:[75,350],
+        ccWith:[3000,6000], ccWithout:[3000,10000]
+    };
+
+    Object.keys(ranges).forEach(id => {
+        const box = document.getElementById(id);
+        if (box && box.checked) {
+            const [low, high] = ranges[id];
+            total += Math.random() * (high - low) + low;
+        }
+    });
+    return total;
+}
+
+// PROJECTION
+function projectBalances(years, initialSavings, paycheckAmount, hsaContribution) {
+    let savings = initialSavings;
+    let hsa = 0;
+
+    for (let i = 0; i < years; i++) {
+        let yearlyHSA = hsaContribution * paychecksPerYear;
+        let medicalCost = getMedicalAnnualCost();
+        let remainingAfterHSA = (paycheckAmount - hsaContribution) * paychecksPerYear;
+        let yearlySavings = remainingAfterHSA * 0.10;
+
+        hsa = (hsa + yearlyHSA - medicalCost);
+        savings = (savings + yearlySavings);
+    }
+
+    return { savings, hsa };
+}
+
+// CHART
+let chart = new Chart(document.getElementById("barChart").getContext("2d"), {
+    type: "bar",
+    data: {
+        labels: projectionYears.map(y => y + " Year"),
+        datasets: [
+            { label: "Savings", data: [], backgroundColor: "#ffb07c" },
+            { label: "HSA", data: [], backgroundColor: "#5b8bd0" }
+        ]
+    },
+    options: {
+        responsive: true,
+        scales: { x: { stacked: true }, y: { stacked: true, beginAtZero: true } }
+    }
+});
+
+// UPDATE CHART (matches original behavior)
+function updateChart() {
+    updateInfoBox();
+
+    let savingsData = [];
+    let hsaData = [];
+    let negative = false;
+
+    projectionYears.forEach(year => {
+        let result = projectBalances(
+            year,
+            parseFloat(document.getElementById("initialSavings").value) || 0,
+            parseFloat(document.getElementById("paycheckAmount").value) || 0,
+            parseFloat(document.getElementById("hsaContribution").value) || 0
+        );
+
+        if (result.hsa < 0) negative = true;
+
+        savingsData.push(result.savings.toFixed(2));
+        hsaData.push(result.hsa.toFixed(2));
+    });
+
+    chart.data.datasets[0].data = savingsData;
+    chart.data.datasets[1].data = hsaData;
+    chart.update();
+
+    const warn = document.getElementById("hsaWarning");
+    if (negative) {
+        warn.style.display = "block";
+        warn.innerHTML = "WARNING: HSA balance projected negative. Out-of-pocket expenditures may be required.";
+    } else {
+        warn.style.display = "none";
+        warn.innerHTML = "";
+    }
+}
+
+// EVENT LISTENERS (update on any input)
+document.querySelectorAll("input, select").forEach(el => {
+    el.addEventListener("input", updateChart);
+});
+
+// AUTO LOAD RECOMMENDATION
+const rec = localStorage.getItem("recommendedHsa");
+if (rec) {
+    document.getElementById("hsaContribution").value = rec;
+}
+
+// INITIAL RENDER (populate histogram on load)
+document.addEventListener("DOMContentLoaded", () => {
+    updateChart();
+});
+</script>
+
+</body>
+</html>

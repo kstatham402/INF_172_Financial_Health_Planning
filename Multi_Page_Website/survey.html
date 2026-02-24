@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HSA Horizon - Survey</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .info-icon {
+            display: inline-block;
+            margin-left: 6px;
+            width: 16px;
+            height: 16px;
+            line-height: 16px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 50%;
+            background: #5b8bd0;
+            color: white;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tooltip-box {
+            visibility: hidden;
+            width: 260px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            padding: 8px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            line-height: 1.4;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .info-icon:hover .tooltip-box {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Arial, sans-serif;
+            padding: 30px;
+            max-width: 1050px;
+            margin: auto;
+            background: linear-gradient(180deg, #ffd6b3, #6495ED);
+            color: black;
+        }
+
+        h2, h3 { color: black; }
+
+        .input-group {
+            margin-bottom: 15px;
+            background: #fffaf5;
+            padding: 12px;
+            border-radius: 12px;
+            border: 1px solid #f0d8c5;
+        }
+
+        select {
+            padding: 8px;
+            font-size: 16px;
+            width: 200px;
+            border-radius: 8px;
+            border: 1px solid #d0b8a8;
+            background: #fff;
+        }
+
+        .info-box {
+            background: #f0f7ff;
+            padding: 10px;
+            border-left: 4px solid #5b8bd0;
+            margin-top: 10px;
+            font-size: 14px;
+            border-radius: 8px;
+        }
+
+        button {
+            padding: 8px 14px;
+            font-size: 14px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: none;
+            background: #ff8a5c;
+            color: white;
+            cursor: pointer;
+        }
+
+        nav {
+            margin-bottom: 20px;
+        }
+
+        nav a {
+            color: #004b8d;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        .nav-button {
+            display: inline-block;
+            padding: 8px 14px;
+            font-size: 14px;
+            border-radius: 8px;
+            background: #ff8a5c;
+            color: white;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-button:hover {
+            background: #ff7040;
+        }
+
+    </style>
+</head>
+<body>
+
+<h2>HSA Horizon</h2>
+<nav>
+    <a href="simulation.html" class="nav-button">Skip to Simulation</a>
+</nav>
+
+<h3>Recommendation Survey</h3>
+
+<div class="input-group">
+    <label>
+        Financial Satisfaction (1-5)
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                How satisfied are you with your current financial situation?<br><br>
+                1 = Very dissatisfied (paycheck-to-paycheck)<br>
+                3 = Neutral / stable<br>
+                5 = Very satisfied (financially secure)
+            </span>
+        </span>
+    </label>
+    <select id="J1">
+        <option>1</option><option>2</option>
+        <option>3</option><option>4</option>
+        <option>5</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Risk Tolerance (1-5)
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                How comfortable are you with financial risk?<br><br>
+                1 = Very risk-averse (prefer stability)<br>
+                3 = Moderate<br>
+                5 = Highly comfortable with volatility
+            </span>
+        </span>
+    </label>
+    <select id="J2">
+        <option>1</option><option>2</option>
+        <option>3</option><option>4</option>
+        <option>5</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Credit Card Use (1-5)
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                How do you manage credit cards?<br><br>
+                1 = Frequently carry balances<br>
+                3 = Sometimes carry balances<br>
+                5 = Always pay in full
+            </span>
+        </span>
+    </label>
+    <select id="F1">
+        <option>1</option><option>2</option>
+        <option>3</option><option>4</option>
+        <option>5</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Debt Perception (1-5)
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                How comfortable are you with debt?<br><br>
+                1 = Very uncomfortable<br>
+                3 = Neutral<br>
+                5 = Comfortable using debt strategically
+            </span>
+        </span>
+    </label>
+    <select id="G23">
+        <option>1</option><option>2</option>
+        <option>3</option><option>4</option>
+        <option>5</option>
+    </select>
+</div>
+
+
+<div class="input-group">
+    <label>
+        Age Range
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Your age helps contextualize healthcare usage and risk factors.
+            </span>
+        </span>
+    </label>
+    <select id="age">
+        <option>18-22</option>
+        <option>23-26</option>
+        <option>27-30</option>
+        <option>31-35</option>
+        <option>36+</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Chronic Conditions
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Do you have ongoing medical conditions requiring regular care?
+            </span>
+        </span>
+    </label>
+    <select id="chronic">
+        <option>No</option>
+        <option>Yes - minor</option>
+        <option>Yes - ongoing treatment</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Large Medical Expenses (past 2 years)
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Have you experienced medical bills over $1,000 in a single year?
+            </span>
+        </span>
+    </label>
+    <select id="largeExpenses">
+        <option>Never</option>
+        <option>Once</option>
+        <option>More than once</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        General Health
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Your overall health influences expected healthcare costs.
+            </span>
+        </span>
+    </label>
+    <select id="health">
+        <option>Excellent</option>
+        <option>Good</option>
+        <option>Fair</option>
+        <option>Poor</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Expected Healthcare Use
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Do you expect routine care or significant medical events next year?
+            </span>
+        </span>
+    </label>
+    <select id="futureUse">
+        <option>Routine only</option>
+        <option>One moderate event</option>
+        <option>Ongoing condition</option>
+        <option>Unsure</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Work Type
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Physical risk at work may influence healthcare risk.
+            </span>
+        </span>
+    </label>
+    <select id="work">
+        <option>Office/low risk</option>
+        <option>Mixed activity</option>
+        <option>Physically demanding</option>
+        <option>High injury risk</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Physical Activity
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Higher activity can correlate with injury risk and healthcare usage.
+            </span>
+        </span>
+    </label>
+    <select id="activity">
+        <option>Low</option>
+        <option>Moderate</option>
+        <option>High</option>
+        <option>Extreme sports</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Financial Priorities (up to 2)
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Select priorities that matter most for your financial planning.
+            </span>
+        </span>
+    </label>
+    <select id="priority1">
+        <option>Minimize monthly expenses</option>
+        <option>Prepare for medical costs</option>
+        <option>Maximize long-term savings</option>
+        <option>Reduce financial stress</option>
+    </select>
+    <select id="priority2">
+        <option>None</option>
+        <option>Minimize monthly expenses</option>
+        <option>Prepare for medical costs</option>
+        <option>Maximize long-term savings</option>
+        <option>Reduce financial stress</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Risk Tolerance
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Your willingness to accept financial uncertainty.
+            </span>
+        </span>
+    </label>
+    <select id="risk2">
+        <option>Conservative</option>
+        <option>Moderate</option>
+        <option>Aggressive</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Confidence in Financial Decisions (1-5)
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Higher confidence may correlate with proactive financial planning.
+            </span>
+        </span>
+    </label>
+    <select id="confidence">
+        <option>1</option><option>2</option>
+        <option>3</option><option>4</option>
+        <option>5</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Currently Contributing to HSA
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Are you already using an HSA account?
+            </span>
+        </span>
+    </label>
+    <select id="hsaCurrent">
+        <option>No</option>
+        <option>Yes, irregularly</option>
+        <option>Yes, consistently</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        HSA Contribution % of Income
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Rough percentage of income directed to HSA contributions.
+            </span>
+        </span>
+    </label>
+    <select id="hsaPercent">
+        <option>0%</option>
+        <option>&lt;1%</option>
+        <option>1-3%</option>
+        <option>3-5%</option>
+        <option>&gt;5%</option>
+        <option>Not sure</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Unexpected $1,000 Bill Response
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                How you would cover a sudden expense helps gauge financial resilience.
+            </span>
+        </span>
+    </label>
+    <select id="bill">
+        <option>Savings</option>
+        <option>HSA</option>
+        <option>Credit card</option>
+        <option>Borrow</option>
+        <option>Not sure</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Months of Savings
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Emergency savings help absorb unexpected costs.
+            </span>
+        </span>
+    </label>
+    <select id="savingsMonths">
+        <option>None</option>
+        <option>&lt;1 month</option>
+        <option>1-2 months</option>
+        <option>3-6 months</option>
+        <option>6+ months</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Income Stability
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Stable income improves ability to plan long-term finances.
+            </span>
+        </span>
+    </label>
+    <select id="income">
+        <option>Very stable</option>
+        <option>Somewhat stable</option>
+        <option>Fluctuates</option>
+        <option>Highly unpredictable</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Deductible Level
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Higher deductibles often pair well with HSAs.
+            </span>
+        </span>
+    </label>
+    <select id="deductible">
+        <option>&lt;$1,500</option>
+        <option>$1,500-$3,000</option>
+        <option>$3,000-$5,000</option>
+        <option>&gt;$5,000</option>
+        <option>Not sure</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Avoided Medical Care Due to Cost
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Avoiding care can signal financial or healthcare barriers.
+            </span>
+        </span>
+    </label>
+    <select id="avoid">
+        <option>No</option>
+        <option>Yes, once</option>
+        <option>Yes, multiple times</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Importance of Tax Advantages
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                HSAs offer tax benefits that may influence financial strategy.
+            </span>
+        </span>
+    </label>
+    <select id="tax">
+        <option>Not important</option>
+        <option>Somewhat</option>
+        <option>Very important</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Stress About Medical Costs (1-5)
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Higher stress may indicate preference for stronger financial safety nets.
+            </span>
+        </span>
+    </label>
+    <select id="stress">
+        <option>1</option><option>2</option>
+        <option>3</option><option>4</option>
+        <option>5</option>
+    </select>
+</div>
+
+<div class="input-group">
+    <label>
+        Major Life Changes Next Year
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Life changes (new job, move, family) can impact financial planning.
+            </span>
+        </span>
+    </label>
+    <select id="life">
+        <option>No</option>
+        <option>Possibly</option>
+        <option>Yes</option>
+    </select>
+</div>
+
+<button onclick="submitSurvey()">Generate Recommendation</button>
+<div class="info-box" id="predictionBox"></div>
+
+<script>
+let predictionTable = {};
+
+async function loadTable() {
+    try {
+        const res = await fetch("prediction_table_full_reduced.json");
+        predictionTable = await res.json();
+    } catch (e) {
+        console.error("Prediction table not found.");
+    }
+}
+
+// ONLY original 4 questions used for prediction
+function buildKey() {
+    return [
+        document.getElementById("J1").value,
+        document.getElementById("J2").value,
+        document.getElementById("F1").value,
+        document.getElementById("G23").value
+    ].join("|");
+}
+
+function submitSurvey() {
+    const key = buildKey();
+    const predicted = predictionTable[key];
+
+    if (predicted === undefined) {
+        document.getElementById("predictionBox").innerHTML =
+            "No recommendation available for this combination.";
+        return;
+    }
+
+    document.getElementById("predictionBox").innerHTML =
+        `<strong>Recommended HSA Contribution:</strong> $${predicted} per paycheck`;
+
+    // Store recommendation for simulation page
+    localStorage.setItem("recommendedHsa", predicted);
+
+    // Redirect to simulation page
+    window.location.href = "simulation.html";
+}
+loadTable();
+</script>
+
+</body>
+</html>
