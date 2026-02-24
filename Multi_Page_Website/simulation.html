@@ -44,11 +44,15 @@
         opacity: 1;
     }
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: "Georgia", serif;
             padding: 30px;
             max-width: 1050px;
             margin: auto;
-            background: linear-gradient(180deg, #ffd6b3, #6495ED);
+            background-image: url('sunrise.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             color: black;
         }
 
@@ -193,6 +197,7 @@
 <h2>HSA Horizon</h2>
 <nav>
     <a href="survey.html" class="nav-button">Return to Survey</a>
+    <a href="welcome.html" class="nav-button">Return to Homescreen</a>
 </nav>
 
 <h3>Simulation Inputs</h3>
@@ -399,9 +404,9 @@ function updateInfoBox() {
 
     document.getElementById("hsaInfo").innerHTML =
         `<strong>HSA Contribution Breakdown:</strong><br>
-         Percent: ${percent.toFixed(2)}%<br>
-         Monthly: $${monthly.toFixed(2)}<br>
-         Annual: $${yearly.toFixed(2)}`;
+         Percent of Paycheck: ${percent.toFixed(2)}%<br>
+         Monthly Amount: $${monthly.toFixed(2)}<br>
+         Annual Amount: $${yearly.toFixed(2)}`;
 }
 
 function getMedicalAnnualCost() {

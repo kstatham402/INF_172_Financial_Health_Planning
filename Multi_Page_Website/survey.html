@@ -45,11 +45,15 @@
         }
 
         body {
-            font-family: 'Segoe UI', Arial, sans-serif;
+            font-family: "Georgia", serif;
             padding: 30px;
             max-width: 1050px;
             margin: auto;
-            background: linear-gradient(180deg, #ffd6b3, #6495ED);
+            background-image: url('sunrise.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
             color: black;
         }
 
@@ -124,6 +128,7 @@
 <h2>HSA Horizon</h2>
 <nav>
     <a href="simulation.html" class="nav-button">Skip to Simulation</a>
+    <a href="welcome.html" class="nav-button">Return to Homescreen</a>
 </nav>
 
 <h3>Recommendation Survey</h3>
@@ -549,7 +554,7 @@
     </select>
 </div>
 
-<button onclick="submitSurvey()">Generate Recommendation</button>
+<button onclick="submitSurvey()">Run Simulation</button>
 <div class="info-box" id="predictionBox"></div>
 
 <script>
