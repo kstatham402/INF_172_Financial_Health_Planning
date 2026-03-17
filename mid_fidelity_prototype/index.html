@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>HSA Horizon - Welcome</title>
+    <style>
+        body {
+            font-family: "Georgia", serif;
+            padding: 40px;
+            max-width: 900px;
+            margin: auto;
+
+            background-image: url('sunrise.jpeg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+
+            min-height: 100vh;
+            color: black;
+            text-align: center;
+        }
+
+        h1 {
+            font-size: 36px;
+        }
+
+        .slogan {
+            font-size: 18px;
+            margin-bottom: 30px;
+        }
+
+        .button-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .nav-button {
+            display: inline-block;
+            padding: 12px 18px;
+            font-size: 16px;
+            border-radius: 8px;
+            background: #ff8a5c;
+            color: white;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            min-width: 260px;
+        }
+
+        .nav-button:hover {
+            background: #ff7040;
+        }
+
+        .info-icon {
+            display: inline-block;
+            margin-left: 6px;
+            width: 16px;
+            height: 16px;
+            line-height: 16px;
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 50%;
+            background: #5b8bd0;
+            color: white;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .tooltip-box {
+            visibility: hidden;
+            width: 220px;
+            background-color: #333;
+            color: #fff;
+            text-align: left;
+            padding: 8px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 10;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            line-height: 1.4;
+            opacity: 0;
+            transition: opacity 0.2s ease-in-out;
+        }
+
+        .info-icon:hover .tooltip-box {
+            visibility: visible;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+<h1>HSA Horizon</h1>
+<div class="slogan">Experiment today to plan for tomorrow.</div>
+
+<div class="button-container">
+
+    <a href="survey.html" class="nav-button">
+        HSA Contribution Assessment
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Take a short questionnaire to estimate a recommended HSA contribution based on financial and health factors.
+            </span>
+        </span>
+    </a>
+
+    <a href="simulation.html" class="nav-button">
+        HSA Simulation
+        <span class="info-icon">i
+            <span class="tooltip-box">
+                Experiment with contributions and medical scenarios to see how your HSA balance and savings might change over time.
+            </span>
+        </span>
+    </a>
+
+</div>
+</body>
+</html>
